@@ -2,7 +2,7 @@ import SATFormula
 import tables
 
 proc test_sputnim(): void = 
-  echo "Hello World!"
+  echo "Testing this!"
 
 var the_formula: SATFormula
 
