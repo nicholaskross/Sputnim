@@ -1,4 +1,4 @@
-c Here is a comment.
+c Hand-made example
 p cnf 12 4
 1 -3 5 0
 -1 5 12 0
