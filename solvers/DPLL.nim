@@ -43,12 +43,16 @@ proc unit_propagate(l:int, formula: var SATFormula): void =
   var newclauses = initTable[int, Table[int, int]]()
   for k, clause in formula.clauses:
     var newclause = initTable[int, int]()
+    var newclauseflag = true
     for literal, _ in clause:
+      newclauseflag = true
       if literal == l:
+        newclauseflag = false
         break
       if literal != -1*l:
         newclause[literal] = literal
-    newclauses[len(newclauses)+1] = newclause
+    if newclauseflag:
+      newclauses[len(newclauses)+1] = newclause
   formula.clauses = newclauses
 
 
@@ -60,13 +64,17 @@ proc pure_literal_assign(l:int, formula: var SATFormula): void =
     else:
       1
   var newclauses = initTable[int, Table[int, int]]()
+  var newclauseflag = true
   for k, clause in formula.clauses:
+    newclauseflag = true
     var newclause = initTable[int, int]()
     for literal, _ in clause:
       if literal == l:
+        newclauseflag = false
         break
       newclause[literal] = literal
-    newclauses[len(newclauses)+1] = newclause
+    if newclauseflag:
+      newclauses[len(newclauses)+1] = newclause
   formula.clauses = newclauses
 
 
@@ -75,8 +83,14 @@ proc pure_literal_assign(l:int, formula: var SATFormula): void =
 proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
   var formula = deepCopy(old_formula)
   if is_consistent_set_of_literals(formula):
+    echo "CONSISTENT SET OF LITERALS"
+    echo $formula.clauses
+    echo "assigned: " & $formula.varAssignment & "\n"
     return (true, formula)
   if contains_empty_clause(formula):
+    echo "CONTAINS EMPTY CLAUSE"
+    echo $formula.clauses
+    echo "assigned: " & $formula.varAssignment & "\n"
     return (false, formula)
   
   var unit_clauses: seq[(Table[int, int], int)]
@@ -91,7 +105,10 @@ proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
       unit_clauses.add((clause, possible_unit_lit))
   
   for unitclause_tuple in unit_clauses:
+    echo "UNIT"
     unit_propagate(unitclause_tuple[1], formula)
+    echo $formula.clauses
+    echo "assigned: " & $formula.varAssignment & "\n"
   
   var pure_literals: Table[int, int]
   var impure_literals: Table[int, int]
@@ -104,7 +121,10 @@ proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
           impure_literals[-1*literal] = -1*literal
   
   for purelit, _ in pure_literals:
+    echo "PURE"
     pure_literal_assign(purelit, formula)
+    echo $formula.clauses
+    echo "assigned: " & $formula.varAssignment & "\n"
 
 
   var nextlit: int = 0
@@ -119,9 +139,15 @@ proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
   var newclause_left = initTable[int, int]()
   var left_result: bool
   newclause_left[nextlit] = nextlit
+  echo "FORMULA BEFORE LEFT BRANCH: " & $formula.clauses
   var leftbranch_formula = deepCopy(formula)
+  leftbranch_formula.varAssignment[$nextlit] = 1
   leftbranch_formula.clauses[len(leftbranch_formula.clauses)+1] = newclause_left
+  echo "LEFT BRANCH"
+  echo $leftbranch_formula.clauses
+  echo "assigned: " & $leftbranch_formula.varAssignment & "\n"
   (left_result, leftbranch_formula) = DPLL_solve(leftbranch_formula)
+  echo "FORMULA AFTER LEFT BRANCH: " & $formula.clauses
 
   if left_result:
     return (left_result, leftbranch_formula)
@@ -129,9 +155,13 @@ proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
     var newclause_right = initTable[int, int]()
     var right_result: bool
     newclause_right[-1*nextlit] = -1*nextlit
+    echo "FORMULA BEFORE RIGHT BRANCH: " & $formula.clauses
     var rightbranch_formula = deepCopy(formula)
+    rightbranch_formula.varAssignment[$nextlit] = -1
     rightbranch_formula.clauses[len(rightbranch_formula.clauses)+1] = newclause_right
+    echo "RIGHT BRANCH"
+    echo $rightbranch_formula.clauses
+    echo "assigned: " & $rightbranch_formula.varAssignment & "\n"
     (right_result, rightbranch_formula) = DPLL_solve(rightbranch_formula)
+    echo "FORMULA AFTER RIGHT BRANCH: " & $formula.clauses
     return (right_result, rightbranch_formula)
-  
-  return (true, formula)

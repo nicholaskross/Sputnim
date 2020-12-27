@@ -76,6 +76,9 @@ var main_formula = readFileToSAT("examples/example1.cnf")
 
 var solvedornot:bool
 
+echo "ROOT"
+echo $main_formula.clauses
+echo "assigned: " & $main_formula.varAssignment & "\n"
 (solvedornot, main_formula) = DPLL_solve(main_formula)
 
 outputSolution(main_formula, solvedornot)
