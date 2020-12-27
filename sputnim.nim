@@ -46,16 +46,20 @@ proc readFileToSAT(filename: string): SATFormula =
   return the_formula
 
 
-proc outputSolution(formula: SATFormula): void =
+proc outputSolution(formula: SATFormula, solvedmaybe: bool): void =
   var outstring:string = ""
   let outfilename:string = formula.originalFilename.split({'.'})[0] & ".out"
-  for k, v in formula.varAssignment:
-    if v != 0:
-      outstring = 
-        if v == -1:
-          outstring & "-" & k & " "
-        else:
-          outstring & k & " "
+  if not solvedmaybe:
+    outstring = outstring & "UNSAT"
+  else:
+    outstring = outstring & "SATISFIABLE\n"
+    for k, v in formula.varAssignment:
+      if v != 0:
+        outstring = 
+          if v == -1:
+            outstring & "-" & k & " "
+          else:
+            outstring & k & " "
   write_file(outfilename, outstring)
 
 var main_formula = readFileToSAT("examples/example1.cnf")
@@ -64,4 +68,4 @@ var solvedornot:bool
 
 (solvedornot, main_formula) = DPLL_func(main_formula)
 
-outputSolution(main_formula)
+outputSolution(main_formula, solvedornot)
