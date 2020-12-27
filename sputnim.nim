@@ -29,6 +29,7 @@ proc readLineToClause(line: string, formula: var SATFormula): void =
 
 proc readFileToSAT(filename: string): SATFormula =
   var the_formula = SATFormula()
+  the_formula.originalFilename = filename
   var first = true
   for line in lines filename:
     if line.split({' '})[0] == "c":
@@ -45,6 +46,22 @@ proc readFileToSAT(filename: string): SATFormula =
   return the_formula
 
 
+proc outputSolution(formula: SATFormula): void =
+  var outstring:string = ""
+  let outfilename:string = formula.originalFilename.split({'.'})[0] & ".out"
+  for k, v in formula.varAssignment:
+    if v != 0:
+      outstring = 
+        if v == -1:
+          outstring & "-" & k & " "
+        else:
+          outstring & k & " "
+  write_file(outfilename, outstring)
+
 var main_formula = readFileToSAT("examples/example1.cnf")
 
-DPLL_func(main_formula)
+var solvedornot:bool
+
+(solvedornot, main_formula) = DPLL_func(main_formula)
+
+outputSolution(main_formula)

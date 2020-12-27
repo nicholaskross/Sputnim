@@ -8,3 +8,4 @@ type
     clauses*: seq[seq[int]]
     maxVars*: int
     numClausesInitial*: int
+    originalFilename*: string
