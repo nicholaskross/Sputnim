@@ -1,6 +1,4 @@
 import tables
-#import intsets
-#import sets
 
 type
   SATFormula* = object

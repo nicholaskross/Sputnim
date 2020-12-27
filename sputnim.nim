@@ -1,7 +1,6 @@
 import SATFormula
 import tables
-#import intsets
-#import sets
+import os
 import strutils
 from solvers/DPLL import DPLL_solve
 
@@ -55,9 +54,13 @@ proc readFileToSAT(filename: string): SATFormula =
   return the_formula
 
 
-proc outputSolution(formula: SATFormula, solvedmaybe: bool): void =
+proc outputSolution(formula: SATFormula, solvedmaybe: bool, optionaloutname: string): void =
   var outstring:string = ""
-  let outfilename:string = formula.originalFilename.split({'.'})[0] & ".out"
+  let outfilename:string = 
+    if optionaloutname == "":
+      formula.originalFilename.split({'.'})[0] & ".out"
+    else:
+      optionaloutname
   if not solvedmaybe:
     outstring = outstring & "UNSAT"
   else:
@@ -72,10 +75,20 @@ proc outputSolution(formula: SATFormula, solvedmaybe: bool): void =
             outstring & original_variable & " "
   write_file(outfilename, outstring)
 
-var main_formula = readFileToSAT("examples/example1.cnf")
+var main_formula: SATFormula
+var outfile_name: string = ""
+when declared(commandLineParams):
+  if len(commandLineParams()) > 0:
+    main_formula = readFileToSAT($commandLineParams()[0])
+    if len(commandLineParams()) > 1:
+      outfile_name = $commandLineParams()[1]
+  else:
+    main_formula = readFileToSAT("examples/example1.cnf")
+else:
+  main_formula = readFileToSAT("examples/example1.cnf")
 
 var solvedornot:bool
 
 (solvedornot, main_formula) = DPLL_solve(main_formula)
 
-outputSolution(main_formula, solvedornot)
+outputSolution(main_formula, solvedornot, outfile_name)

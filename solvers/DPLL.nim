@@ -1,8 +1,5 @@
 import ../SATFormula
 import tables
-#import sets
-#import intsets
-#import sequtils
 from strutils import parseInt
 
 
