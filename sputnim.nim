@@ -72,7 +72,7 @@ proc outputSolution(formula: SATFormula, solvedmaybe: bool): void =
             outstring & original_variable & " "
   write_file(outfilename, outstring)
 
-var main_formula = readFileToSAT("examples/example2.cnf")
+var main_formula = readFileToSAT("examples/example1.cnf")
 
 var solvedornot:bool
 
