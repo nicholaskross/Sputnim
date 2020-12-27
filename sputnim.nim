@@ -5,7 +5,6 @@ import strutils
 from solvers/DPLL import DPLL_solve
 
 
-
 proc readLineToClause(line: string, formula: var SATFormula): void =
   let splitted = line.split({' '})
   var this_clause = initTable[int, int]()
@@ -33,6 +32,8 @@ proc readLineToClause(line: string, formula: var SATFormula): void =
     this_clause[this_literal] = this_literal
   formula.clauses[len(formula.clauses)+1] = this_clause
 
+
+
 proc readFileToSAT(filename: string): SATFormula =
   var the_formula = SATFormula()
   the_formula.originalFilename = filename
@@ -52,6 +53,7 @@ proc readFileToSAT(filename: string): SATFormula =
     else:
       readLineToClause(line, the_formula)
   return the_formula
+
 
 
 proc outputSolution(formula: SATFormula, solvedmaybe: bool, optionaloutname: string): void =
@@ -74,6 +76,8 @@ proc outputSolution(formula: SATFormula, solvedmaybe: bool, optionaloutname: str
           else:
             outstring & original_variable & " "
   write_file(outfilename, outstring)
+
+
 
 var main_formula: SATFormula
 var outfile_name: string = ""

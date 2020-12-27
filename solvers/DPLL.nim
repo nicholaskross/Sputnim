@@ -3,8 +3,6 @@ import tables
 from strutils import parseInt
 
 
-
-
 proc is_consistent_set_of_literals(formula: SATFormula): bool =
   var seen: seq[int]
   for k, clause in formula.clauses:
@@ -21,13 +19,11 @@ proc is_consistent_set_of_literals(formula: SATFormula): bool =
 
 
 
-
 proc contains_empty_clause(formula: SATFormula): bool =
   for k, clause in formula.clauses:
     if len(clause) == 0:
       return true
   return false
-
 
 
 
@@ -76,7 +72,6 @@ proc pure_literal_assign(l:int, formula: var SATFormula): void =
 
 
 
-
 proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
   var formula = deepCopy(old_formula)
   if is_consistent_set_of_literals(formula):
@@ -110,7 +105,6 @@ proc DPLL_solve*(old_formula:var SATFormula): (bool, SATFormula) =
   
   for purelit, _ in pure_literals:
     pure_literal_assign(purelit, formula)
-
 
   var nextlit: int = 0
   for litstr, assigned in formula.varAssignment:
